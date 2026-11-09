@@ -1,0 +1,52 @@
+/* ================================================================
+   style.css — Smart Kitchen Dashboard
+   Tailwind handles most styling; this file adds only what Tailwind
+   can't express cleanly (tab active state, chart container, etc.)
+   ================================================================ */
+
+/* ── Tab active state ─────────────────────────────────────────── */
+.tab-active {
+  border-bottom-color: #3b82f6;  /* blue-500 */
+  color: #93c5fd;                /* blue-300 */
+}
+
+/* ── Filter button active state ──────────────────────────────── */
+.filter-active {
+  background-color: #1d4ed8;  /* blue-700 */
+  color: #dbeafe;              /* blue-100 */
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+}
+
+/* ── Pump countdown number ───────────────────────────────────── */
+#pump-countdown {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Emergency banner animation ─────────────────────────────── */
+@keyframes blinkRed {
+  0%,100% { background-color: #dc2626; } /* red-600 */
+  50%     { background-color: #991b1b; } /* red-800 */
+}
+#emergency-banner:not(.hidden) {
+  animation: blinkRed 0.8s ease-in-out infinite;
+}
+
+/* ── MQ-2 bar smooth transitions ────────────────────────────── */
+#mq2-bar {
+  transition: width 0.4s ease, background-color 0.4s ease;
+}
+
+/* ── Projector-friendly font sizes ──────────────────────────── */
+@media (min-width: 1024px) {
+  .text-3xl { font-size: 2rem; }
+  body       { font-size: 1rem; line-height: 1.6; }
+}
+
+/* ── Scrollbar (dark theme) ─────────────────────────────────── */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #111827; }
+::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+
+/* ── Prevent layout shift when banner appears ────────────────── */
+body { padding-top: 0; transition: padding-top 0.2s ease; }

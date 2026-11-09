@@ -1,0 +1,8 @@
+Unduh chart.umd.min.js dan letakkan di folder ini sebelum demo.
+
+Perintah:
+  curl -Lo chart.umd.min.js https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js
+
+Atau di VPS:
+  cd ~/smart-kitchen-backend/dashboard/assets/vendor
+  curl -Lo chart.umd.min.js https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js

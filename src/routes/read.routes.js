@@ -6,7 +6,16 @@ const adminAuth = require('../middlewares/adminAuth');
 const deviceRepo = require('../repositories/deviceRepo');
 const sensorRepo = require('../repositories/sensorRepo');
 const alertRepo  = require('../repositories/alertRepo');
-const controlRepo = require('../repositories/controlRepo');
+
+// GET /api/v1/devices  — list all devices (used by dashboard Perangkat tab)
+router.get('/', adminAuth, async (_req, res, next) => {
+  try {
+    const [rows] = await pool.execute(
+      'SELECT id_device, lokasi, status_perangkat, terakhir_terlihat FROM devices ORDER BY id_device'
+    );
+    res.json({ ok: true, data: rows });
+  } catch (err) { next(err); }
+});
 
 // GET /api/v1/devices/:id/status
 router.get('/:id/status', adminAuth, async (req, res, next) => {
