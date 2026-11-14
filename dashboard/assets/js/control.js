@@ -16,20 +16,17 @@ document.getElementById('pump-confirm-no').addEventListener('click', () => {
   overlay.classList.add('hidden');
 });
 
-// ── Tombol bisukan alarm dari banner darurat ───────────────────────
-document.getElementById('btn-mute-banner').addEventListener('click', () => {
-  if (appState.kodeState >= 5) {
-    showCtrlNotif('🚫 Alarm kritis tidak dapat dibisukan (state 5–8)', false);
-    return;
-  }
-  _sendControl({ buzzer: 'MUTE' });
-});
-
 // ── Event listener tombol kontrol ─────────────────────────────────
 document.querySelectorAll('.ctrl-btn').forEach(btn => {
   btn.addEventListener('click', async () => {
     const ctrl = btn.dataset.ctrl;   // 'kipas' | 'pompa' | 'buzzer'
     const val  = btn.dataset.val;    // 'AUTO' | 'ON' | 'OFF' | 'MUTE'
+
+    // Guard: perangkat OFFLINE
+    if (appState.statusPerangkat !== 'ONLINE') {
+      showCtrlNotif('🔌 Perangkat OFFLINE — perintah tidak dapat dikirim', false);
+      return;
+    }
 
     // Safety gate: kipas ON saat state >= 5
     if (ctrl === 'kipas' && val === 'ON' && appState.kodeState >= 5) {

@@ -9,10 +9,12 @@ SET time_zone = '+07:00';
 
 -- 1. Data induk perangkat
 CREATE TABLE IF NOT EXISTS devices (
-  id_device        VARCHAR(20)  NOT NULL,
-  lokasi           VARCHAR(100) NOT NULL,
-  status_perangkat ENUM('ONLINE','OFFLINE') NOT NULL DEFAULT 'OFFLINE',
-  tanggal_pasang   DATE NOT NULL,
+  id_device          VARCHAR(20)  NOT NULL,
+  lokasi             VARCHAR(100) NOT NULL,
+  status_perangkat   ENUM('ONLINE','OFFLINE') NOT NULL DEFAULT 'OFFLINE',
+  tanggal_pasang     DATE NOT NULL,
+  terakhir_terlihat  DATETIME NULL DEFAULT NULL,
+  api_key_hash       VARCHAR(64) NOT NULL DEFAULT '',
   PRIMARY KEY (id_device)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -74,3 +76,33 @@ SELECT d.id_device, d.lokasi, d.status_perangkat,
 FROM devices d
 LEFT JOIN sensor_logs s
   ON s.id_log = (SELECT MAX(id_log) FROM sensor_logs WHERE id_device = d.id_device);
+
+-- ================================================================
+-- Seed data awal (wajib ada sebelum menjalankan backend)
+-- ================================================================
+
+-- Device DAPUR01
+-- api_key_hash = SHA-256("Smart*2026")
+-- Untuk menghitung ulang: node -e "require('crypto').createHash('sha256').update('Smart*2026').digest('hex')" | Write-Output
+-- Atau di Linux: echo -n "Smart*2026" | sha256sum
+INSERT INTO devices (
+    id_device, 
+    lokasi, 
+    status_perangkat, 
+    tanggal_pasang, 
+    api_key_hash
+)
+VALUES (
+    'DAPUR01',
+    'Dapur Bersama Lt. 1',
+    'OFFLINE',
+    CURDATE(),
+    SHA2('Smart*2026', 256)
+)
+ON DUPLICATE KEY UPDATE
+    lokasi       = VALUES(lokasi),
+    api_key_hash = VALUES(api_key_hash);
+
+-- Baris device_control untuk DAPUR01 (semua AUTO = mode otomatis)
+INSERT IGNORE INTO device_control (id_device, cmd_kipas, cmd_pompa, cmd_buzzer, sumber_kontrol)
+VALUES ('DAPUR01', 'AUTO', 'AUTO', 'AUTO', 'OTOMATIS');

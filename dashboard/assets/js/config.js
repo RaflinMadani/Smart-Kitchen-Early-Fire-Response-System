@@ -15,8 +15,8 @@ export const POLL_MS = 3000;
 /** Timeout setiap fetch request (ms) */
 export const FETCH_TIMEOUT_MS = 4000;
 
-/** Ambang ADC MQ-2 untuk penanda garis di grafik */
-export const AMBANG_ASAP = 300;
+/** Ambang ADC MQ-2 untuk penanda garis di grafik (1000 PPM ≈ ADC 1000) */
+export const AMBANG_ASAP = 1000;
 
 /** Nilai ADC penuh (12-bit ESP32) */
 export const ADC_MAX = 4095;

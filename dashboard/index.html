@@ -14,15 +14,6 @@
             waspada: { bg: '#fef9c3', text: '#78350f', border: '#fcd34d' },
             bahaya:  { bg: '#fee2e2', text: '#7f1d1d', border: '#fca5a5' },
           },
-          animation: {
-            'blink-red': 'blinkRed 0.8s ease-in-out infinite',
-          },
-          keyframes: {
-            blinkRed: {
-              '0%,100%': { backgroundColor: '#dc2626' },
-              '50%':     { backgroundColor: '#991b1b' },
-            },
-          },
         },
       },
     };
@@ -32,26 +23,14 @@
 <body class="bg-gray-950 text-gray-100 min-h-screen font-sans">
 
   <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- BANNER DARURAT (hidden by default)                          -->
+  <!-- BANNER DARURAT (hidden by default) — statis, tanpa popup   -->
   <!-- ═══════════════════════════════════════════════════════════ -->
-  <div id="emergency-banner" class="hidden fixed top-0 left-0 right-0 z-50 animate-blink-red">
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4">
-      <div class="flex items-center gap-3">
-        <span class="text-3xl">🔥</span>
-        <div>
-          <p id="emergency-title" class="text-white font-bold text-xl tracking-wide">KEBAKARAN TERDETEKSI</p>
-          <p id="emergency-sub"   class="text-red-200 text-sm">API + ASAP + PANAS — Segera evakuasi!</p>
-        </div>
-      </div>
-      <div class="flex gap-3 shrink-0">
-        <a href="tel:112"
-           class="bg-white text-red-700 font-bold px-5 py-2 rounded-lg text-lg shadow hover:bg-red-50 transition">
-          📞 Hubungi 112
-        </a>
-        <button id="btn-mute-banner"
-                class="bg-red-900 border border-red-400 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-red-800 transition">
-          🔕 Bisukan Alarm
-        </button>
+  <div id="emergency-banner" class="hidden bg-red-700 border-b-2 border-red-400">
+    <div class="flex items-center gap-3 px-5 py-3">
+      <span class="text-2xl leading-none">🔥</span>
+      <div class="flex-1 min-w-0">
+        <p id="emergency-title" class="text-white font-bold text-base leading-tight">KONDISI BAHAYA</p>
+        <p id="emergency-sub"   class="text-red-200 text-xs mt-0.5">—</p>
       </div>
     </div>
   </div>
@@ -165,11 +144,11 @@
           <!-- Bar ADC dengan penanda ambang -->
           <div class="relative h-3 bg-gray-700 rounded-full overflow-hidden">
             <div id="mq2-bar" class="h-full rounded-full transition-all duration-300 bg-green-500" style="width:0%"></div>
-            <!-- Penanda ambang 300 = 300/4095 ≈ 7.33% -->
-            <div class="absolute top-0 h-full w-0.5 bg-yellow-400 opacity-80" style="left:7.33%"></div>
+            <!-- Penanda ambang 1000 = 1000/4095 ≈ 24.42% -->
+            <div class="absolute top-0 h-full w-0.5 bg-yellow-400 opacity-80" style="left:24.42%"></div>
           </div>
           <div class="flex justify-between text-gray-600 text-xs mt-0.5">
-            <span>0</span><span class="text-yellow-500">▲300</span><span>4095</span>
+            <span>0</span><span class="text-yellow-500">▲1000</span><span>4095</span>
           </div>
         </div>
 
@@ -213,6 +192,13 @@
 
     <!-- ── TAB: KONTROL ──────────────────────────────────────────── -->
     <section id="tab-kontrol" class="tab-panel hidden">
+
+      <!-- Banner: Perangkat OFFLINE (hidden by default) -->
+      <div id="ctrl-offline-warn"
+           class="hidden bg-red-950 border border-red-600 rounded-xl p-4 mb-5 text-sm text-red-200">
+        🔌 <strong>Perangkat ESP32 OFFLINE</strong> — Semua tombol kontrol dikunci.
+        Tombol akan aktif kembali otomatis saat perangkat terhubung.
+      </div>
 
       <!-- Info mode manual -->
       <div class="bg-blue-950 border border-blue-700 rounded-xl p-4 mb-5 text-sm text-blue-200">
@@ -336,7 +322,7 @@
           <canvas id="sensor-chart"></canvas>
         </div>
         <p class="text-xs text-gray-500 mt-1">
-          Garis putus-putus kuning = ambang asap 300 ADC · Sumbu kanan = suhu (°C)
+          Garis putus-putus kuning = ambang asap 1000 ADC · Sumbu kanan = suhu (°C)
         </p>
       </div>
 
@@ -344,11 +330,14 @@
       <div class="bg-gray-900 rounded-xl border border-gray-800 p-4">
         <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h2 class="font-semibold text-base">📋 Riwayat Peringatan</h2>
-          <div class="flex gap-2">
+          <div class="flex gap-2 flex-wrap">
             <button id="alert-filter-all"    class="alert-filter-btn filter-active text-xs px-3 py-1 rounded-full">Semua</button>
-            <button id="alert-filter-aktif"  class="alert-filter-btn text-xs px-3 py-1 rounded-full bg-gray-700 text-gray-300 hover:bg-gray-600">Aktif</button>
-            <button id="alert-filter-selesai" class="alert-filter-btn text-xs px-3 py-1 rounded-full bg-gray-700 text-gray-300 hover:bg-gray-600">Selesai</button>
-            <button id="btn-refresh-alerts"  class="text-xs px-3 py-1 rounded-full bg-blue-900 text-blue-300 hover:bg-blue-800">↻ Muat Ulang</button>
+            <button id="alert-filter-aktif"  class="alert-filter-btn text-xs px-3 py-1 rounded-full bg-gray-700 text-gray-300 hover:bg-gray-600"
+                    title="Peringatan yang masih berlangsung (belum selesai)">Sedang Berlangsung</button>
+            <button id="alert-filter-selesai" class="alert-filter-btn text-xs px-3 py-1 rounded-full bg-gray-700 text-gray-300 hover:bg-gray-600"
+                    title="Peringatan yang sudah berakhir">Sudah Selesai</button>
+            <button id="btn-refresh-alerts"  class="text-xs px-3 py-1 rounded-full bg-blue-900 text-blue-300 hover:bg-blue-800"
+                    title="Ambil ulang data terbaru dari database MySQL">↻ Muat Ulang dari DB</button>
           </div>
         </div>
         <div class="overflow-x-auto">

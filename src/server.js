@@ -1,20 +1,23 @@
 'use strict';
 require('dotenv').config();
-const cfg = require('./config/env');
-const app = require('./app');
+const cfg          = require('./config/env');
+const app          = require('./app');
 const offlineWatcher = require('./jobs/offlineWatcher');
 const manualRevert   = require('./jobs/manualRevert');
-const logger = require('./utils/logger');
+const mqttService    = require('./services/mqttService');
+const logger         = require('./utils/logger');
 
 const server = app.listen(cfg.port, '0.0.0.0', () => {
   logger.info(`[server] Smart Kitchen backend listening on 0.0.0.0:${cfg.port}`);
   offlineWatcher.start();
   manualRevert.start();
+  mqttService.start();
 });
 
 // Graceful shutdown
 function shutdown(signal) {
   logger.info(`[server] ${signal} received — shutting down`);
+  mqttService.stop();
   server.close(() => {
     logger.info('[server] HTTP server closed');
     process.exit(0);

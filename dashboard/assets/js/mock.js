@@ -5,22 +5,22 @@
 import { AMBANG_ASAP } from './config.js';
 
 const MOCK_CYCLE = [
-  // state 1: normal
-  { kode_state: 1, tingkat_risiko: 'AMAN',    suhu_celcius: 28.5, kelembapan_rh: 60, mq2_adc: 120, status_api: 'TIDAK_ADA', status_kipas: 'OFF', status_pompa: 'OFF', status_buzzer: 'DIAM' },
-  // state 2: thermal warning
-  { kode_state: 2, tingkat_risiko: 'WASPADA', suhu_celcius: 42.1, kelembapan_rh: 55, mq2_adc: 150, status_api: 'TIDAK_ADA', status_kipas: 'ON',  status_pompa: 'OFF', status_buzzer: 'BERDENYUT' },
-  // state 3: gas/smoke warning
-  { kode_state: 3, tingkat_risiko: 'WASPADA', suhu_celcius: 30.0, kelembapan_rh: 58, mq2_adc: 450, status_api: 'TIDAK_ADA', status_kipas: 'ON',  status_pompa: 'OFF', status_buzzer: 'BERDENYUT' },
-  // state 4: pre-combustion
-  { kode_state: 4, tingkat_risiko: 'WASPADA', suhu_celcius: 43.5, kelembapan_rh: 52, mq2_adc: 520, status_api: 'TIDAK_ADA', status_kipas: 'ON',  status_pompa: 'OFF', status_buzzer: 'BERDENYUT' },
+  // state 1: normal                   (mq2 jauh di bawah 1000)
+  { kode_state: 1, tingkat_risiko: 'AMAN',    suhu_celcius: 28.5, kelembapan_rh: 60, mq2_adc: 320,  status_api: 'TIDAK_ADA',  status_kipas: 'OFF', status_pompa: 'OFF', status_buzzer: 'DIAM'      },
+  // state 2: thermal warning           (suhu > 40, mq2 normal)
+  { kode_state: 2, tingkat_risiko: 'WASPADA', suhu_celcius: 42.1, kelembapan_rh: 55, mq2_adc: 480,  status_api: 'TIDAK_ADA',  status_kipas: 'ON',  status_pompa: 'OFF', status_buzzer: 'BERDENYUT' },
+  // state 3: gas/smoke warning         (mq2 > 1000, suhu normal)
+  { kode_state: 3, tingkat_risiko: 'WASPADA', suhu_celcius: 30.0, kelembapan_rh: 58, mq2_adc: 1200, status_api: 'TIDAK_ADA',  status_kipas: 'ON',  status_pompa: 'OFF', status_buzzer: 'BERDENYUT' },
+  // state 4: pre-combustion            (suhu > 40 + mq2 > 1000)
+  { kode_state: 4, tingkat_risiko: 'WASPADA', suhu_celcius: 43.5, kelembapan_rh: 52, mq2_adc: 1350, status_api: 'TIDAK_ADA',  status_kipas: 'ON',  status_pompa: 'OFF', status_buzzer: 'BERDENYUT' },
   // state 5: api saja
-  { kode_state: 5, tingkat_risiko: 'BAHAYA',  suhu_celcius: 33.0, kelembapan_rh: 50, mq2_adc: 180, status_api: 'TERDETEKSI', status_kipas: 'OFF', status_pompa: 'ON',  status_buzzer: 'KONTINU' },
+  { kode_state: 5, tingkat_risiko: 'BAHAYA',  suhu_celcius: 33.0, kelembapan_rh: 50, mq2_adc: 650,  status_api: 'TERDETEKSI', status_kipas: 'OFF', status_pompa: 'ON',  status_buzzer: 'KONTINU'   },
   // state 6: api + panas
-  { kode_state: 6, tingkat_risiko: 'BAHAYA',  suhu_celcius: 46.0, kelembapan_rh: 48, mq2_adc: 200, status_api: 'TERDETEKSI', status_kipas: 'OFF', status_pompa: 'ON',  status_buzzer: 'KONTINU' },
-  // state 7: api + asap
-  { kode_state: 7, tingkat_risiko: 'BAHAYA',  suhu_celcius: 35.0, kelembapan_rh: 45, mq2_adc: 580, status_api: 'TERDETEKSI', status_kipas: 'OFF', status_pompa: 'ON',  status_buzzer: 'KONTINU' },
-  // state 8: kebakaran penuh
-  { kode_state: 8, tingkat_risiko: 'BAHAYA',  suhu_celcius: 52.0, kelembapan_rh: 40, mq2_adc: 900, status_api: 'TERDETEKSI', status_kipas: 'OFF', status_pompa: 'ON',  status_buzzer: 'KONTINU' },
+  { kode_state: 6, tingkat_risiko: 'BAHAYA',  suhu_celcius: 46.0, kelembapan_rh: 48, mq2_adc: 700,  status_api: 'TERDETEKSI', status_kipas: 'OFF', status_pompa: 'ON',  status_buzzer: 'KONTINU'   },
+  // state 7: api + asap                (mq2 > 1000)
+  { kode_state: 7, tingkat_risiko: 'BAHAYA',  suhu_celcius: 35.0, kelembapan_rh: 45, mq2_adc: 1500, status_api: 'TERDETEKSI', status_kipas: 'OFF', status_pompa: 'ON',  status_buzzer: 'KONTINU'   },
+  // state 8: kebakaran penuh           (api + mq2>1000 + suhu>40)
+  { kode_state: 8, tingkat_risiko: 'BAHAYA',  suhu_celcius: 52.0, kelembapan_rh: 40, mq2_adc: 2200, status_api: 'TERDETEKSI', status_kipas: 'OFF', status_pompa: 'ON',  status_buzzer: 'KONTINU'   },
 ];
 
 let mockIdx = 0;

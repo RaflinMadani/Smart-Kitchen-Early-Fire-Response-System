@@ -144,28 +144,40 @@ function renderBuzzer() {
   el.valBuzzer.className     = `font-bold mt-1 ${colors[val] || 'text-gray-400'}`;
 }
 
-// ── Emergency banner ──────────────────────────────────────────────
+// ── Emergency banner — banner statis, tanpa popup / suara ─────────
 export function updateEmergencyBanner(kode) {
   if (kode >= 5) {
     el.emergencyBanner.classList.remove('hidden');
-    const meta = STATE_META[kode];
+    const meta = STATE_META[kode] || STATE_META[5];
     el.emergencyTitle.textContent = `BAHAYA — ${meta.nama.toUpperCase()}`;
     el.emergencySub.textContent   = meta.desc;
   } else {
     el.emergencyBanner.classList.add('hidden');
+    // Reset teks agar tidak tersisa saat muncul berikutnya
+    el.emergencyTitle.textContent = 'KONDISI BAHAYA';
+    el.emergencySub.textContent   = '—';
   }
 }
 
 // ── Connection indicator ──────────────────────────────────────────
-export function setConnectionStatus(online) {
-  if (online) {
-    el.connDot.className    = 'inline-block w-2.5 h-2.5 rounded-full bg-green-400';
-    el.connLabel.textContent = 'Terhubung';
+/**
+ * @param {'server_ok' | 'device_online' | 'device_offline' | 'server_down'} state
+ */
+export function setConnectionStatus(state) {
+  if (state === 'device_online') {
+    el.connDot.className     = 'inline-block w-2.5 h-2.5 rounded-full bg-green-400';
+    el.connLabel.textContent = 'Perangkat Online';
     el.serverOffBanner.classList.add('hidden');
-  } else {
-    el.connDot.className    = 'inline-block w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse';
-    el.connLabel.textContent = 'Terputus';
+  } else if (state === 'device_offline') {
+    el.connDot.className     = 'inline-block w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse';
+    el.connLabel.textContent = 'Perangkat Offline';
     el.serverOffBanner.classList.remove('hidden');
+    el.serverOffBanner.textContent = '⚠️ Perangkat ESP32 OFFLINE — data terakhir dari database · Tombol kontrol dikunci.';
+  } else if (state === 'server_down') {
+    el.connDot.className     = 'inline-block w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse';
+    el.connLabel.textContent = 'Server Terputus';
+    el.serverOffBanner.classList.remove('hidden');
+    el.serverOffBanner.textContent = '⚠️ Server tidak terjangkau — menampilkan data terakhir · Mencoba ulang…';
   }
 }
 
@@ -235,6 +247,22 @@ export function setCtrlBusy(busy) {
   });
 }
 
+/**
+ * Kunci semua tombol kontrol saat perangkat OFFLINE.
+ * Menampilkan overlay tipis dengan pesan.
+ */
+export function setDeviceOfflineLock(offline) {
+  document.querySelectorAll('.ctrl-btn').forEach(b => {
+    b.disabled = offline;
+    b.classList.toggle('opacity-30', offline);
+    b.classList.toggle('cursor-not-allowed', offline);
+    b.title = offline ? 'Perangkat OFFLINE — perintah tidak dapat dikirim' : '';
+  });
+  // Tampilkan atau sembunyikan banner peringatan di tab kontrol
+  const warn = document.getElementById('ctrl-offline-warn');
+  if (warn) warn.classList.toggle('hidden', !offline);
+}
+
 export function showCtrlNotif(msg, success) {
   el.ctrlNotif.textContent = msg;
   el.ctrlNotif.className = `rounded-lg p-3 mb-4 text-sm font-medium ${
@@ -283,22 +311,40 @@ export function renderAlertTable(rows) {
   for (const r of rows) {
     const tr = tbody.insertRow();
     tr.className = 'border-b border-gray-800 hover:bg-gray-800 transition';
-    const cells = [
-      fmtTime(r.waktu_mulai),
-      r.waktu_selesai ? fmtTime(r.waktu_selesai) : '—',
-      `State ${r.state_puncak}`,
-      r.tingkat_risiko,
-      r.status_alert,
-    ];
-    const aligns = ['text-left','text-left','text-center','text-center','text-center'];
-    cells.forEach((txt, i) => {
-      const td = tr.insertCell();
-      td.className = `py-2 ${aligns[i]} text-sm`;
-      td.textContent = txt;
-      // Color badges
-      if (i === 3) td.className += r.tingkat_risiko === 'BAHAYA' ? ' text-red-400 font-bold' : ' text-yellow-400 font-semibold';
-      if (i === 4) td.className += r.status_alert === 'AKTIF'   ? ' text-orange-400 font-bold' : ' text-gray-400';
-    });
+
+    // Waktu mulai
+    const tdMulai = tr.insertCell();
+    tdMulai.className = 'py-2 text-left text-sm';
+    tdMulai.textContent = fmtTime(r.waktu_mulai);
+
+    // Waktu selesai
+    const tdSelesai = tr.insertCell();
+    tdSelesai.className = 'py-2 text-left text-sm';
+    tdSelesai.textContent = r.waktu_selesai ? fmtTime(r.waktu_selesai) : '—';
+
+    // State puncak
+    const tdState = tr.insertCell();
+    tdState.className = 'py-2 text-center text-sm font-mono';
+    tdState.textContent = `State ${r.state_puncak}`;
+
+    // Tingkat risiko
+    const tdRisiko = tr.insertCell();
+    tdRisiko.className = 'py-2 text-center text-sm font-semibold ' +
+      (r.tingkat_risiko === 'BAHAYA' ? 'text-red-400' : 'text-yellow-400');
+    tdRisiko.textContent = r.tingkat_risiko;
+
+    // Status — tampilkan label yang jelas, bukan hanya kode AKTIF/SELESAI
+    const tdStatus = tr.insertCell();
+    tdStatus.className = 'py-2 text-center text-xs';
+    const badge = document.createElement('span');
+    if (r.status_alert === 'AKTIF') {
+      badge.textContent = 'Sedang Berlangsung';
+      badge.className   = 'bg-orange-900 text-orange-300 font-bold px-2 py-0.5 rounded-full';
+    } else {
+      badge.textContent = 'Sudah Selesai';
+      badge.className   = 'bg-gray-700 text-gray-400 px-2 py-0.5 rounded-full';
+    }
+    tdStatus.appendChild(badge);
   }
 }
 

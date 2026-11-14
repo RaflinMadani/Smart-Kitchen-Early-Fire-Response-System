@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const { calcState, getRisiko, getAutoAction } = require('../src/services/stateEngine');
 
 // Thresholds matching default .env
-const AMBANG_ASAP = 300;
+const AMBANG_ASAP = 1000;
 const AMBANG_SUHU = 40;
 
 describe('stateEngine — 8 states', () => {
@@ -34,11 +34,11 @@ describe('stateEngine — 8 states', () => {
 
 describe('stateEngine — boundary values', () => {
   it('suhu=40 adc=300 api=0 → state 1 (boundaries not included)', () => {
-    assert.equal(calcState(40, 300, 0, AMBANG_ASAP, AMBANG_SUHU), 1);
+    assert.equal(calcState(40, 1000, 0, AMBANG_ASAP, AMBANG_SUHU), 1);
   });
 
   it('suhu=40.1 adc=301 api=0 → state 4', () => {
-    assert.equal(calcState(40.1, 301, 0, AMBANG_ASAP, AMBANG_SUHU), 4);
+    assert.equal(calcState(40.1, 1001, 0, AMBANG_ASAP, AMBANG_SUHU), 4);
   });
 
   it('suhu=null (sensor error) → not panas', () => {
