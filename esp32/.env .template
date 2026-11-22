@@ -1,0 +1,12 @@
+MQTT_HOST="your-cluster.ala.asia-southeast1.emqxsl.com"
+MQTT_PORT="8883"
+
+MQTT_USER="your_emqx_username"
+MQTT_PASS="*"
+
+SERVER_URL="https://your-backend-api.com/api/telemetry"
+API_KEY="API_KEY"
+DEVICE_ID="esp32-kitchen-01"
+
+WIFI_SSID="Your_WiFi_SSID"
+WIFI_PASS="Your_WiFi_Password"

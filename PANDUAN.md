@@ -111,7 +111,7 @@ Jalankan perintah berikut di dalam MySQL shell:
 CREATE DATABASE smart_kitchen CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Buat user aplikasi
-CREATE USER 'sk_app'@'localhost' IDENTIFIED BY 'Smart*2026';
+CREATE USER 'sk_app'@'localhost' IDENTIFIED BY 'password_pilihan_anda';
 GRANT ALL PRIVILEGES ON smart_kitchen.* TO 'sk_app'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
@@ -135,12 +135,12 @@ mysql -u sk_app -p smart_kitchen < sql/patch_v2.sql
 
 #### Verifikasi Hash API Key
 
-Perintah `patch_v2.sql` sudah menyertakan device `DAPUR01` dengan API key `Smart*2026`.
-Verifikasi hash yang tersimpan cocok:
+File `smart_kitchen.sql` sudah menyertakan device `DAPUR01` dengan contoh API key.
+Verifikasi hash yang tersimpan cocok dengan API key yang Anda gunakan:
 
 ```bash
 # Linux / VPS — hitung SHA-256 dari API key Anda
-echo -n "Smart*2026" | sha256sum
+echo -n "API_KEY_ANDA" | sha256sum
 # Hasilnya harus cocok dengan nilai di kolom api_key_hash
 ```
 
@@ -208,9 +208,9 @@ PORT=3000
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_USER=sk_app
-DB_PASS=Smart*2026         # ← ganti jika Anda set password berbeda
+DB_PASS=password_pilihan_anda   # ← isi dengan password MySQL yang Anda set
 DB_NAME=smart_kitchen
-ADMIN_TOKEN=Smart*2026     # ← token untuk akses dashboard web
+ADMIN_TOKEN=token_admin_anda    # ← token untuk akses dashboard web (buat sendiri)
 
 AMBANG_ASAP=1000           # Threshold gas MQ-2 (ADC 0-4095)
 AMBANG_SUHU=40             # Threshold suhu (°C)
@@ -320,7 +320,7 @@ sudo mysql
 ```
 ```sql
 CREATE DATABASE smart_kitchen CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'sk_app'@'localhost' IDENTIFIED BY 'Smart*2026';
+CREATE USER 'sk_app'@'localhost' IDENTIFIED BY 'password_pilihan_anda';
 GRANT ALL PRIVILEGES ON smart_kitchen.* TO 'sk_app'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
@@ -491,7 +491,7 @@ curl http://localhost:3000/health
 # Respons: {"ok":true,"ts":"..."}
 
 # Cek status device (ganti token jika diubah)
-curl -H "Authorization: Bearer Smart*2026" \
+curl -H "Authorization: Bearer TOKEN_ADMIN_ANDA" \
      http://localhost:3000/api/v1/devices/DAPUR01/status
 ```
 

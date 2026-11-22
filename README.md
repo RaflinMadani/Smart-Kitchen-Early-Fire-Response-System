@@ -1,6 +1,8 @@
 # 🔥 Smart Kitchen Early Fire Response System
 
-> **Sistem deteksi dan respons kebakaran dini berbasis IoT untuk dapur** — menggabungkan sensor fisik ESP32, backend Node.js, komunikasi MQTT real-time, dashboard monitoring, dan notifikasi Telegram.
+**Tema Proyek:** Internet of Things (IoT) — Sistem Keamanan & Otomasi Rumah Tangga
+
+> **Deskripsi Singkat:** Sistem deteksi dan respons kebakaran dini berbasis IoT untuk dapur. Menggabungkan sensor fisik pada ESP32 (suhu, gas, api), backend Node.js, komunikasi MQTT real-time via EMQX Cloud, dashboard monitoring berbasis web, serta notifikasi otomatis ke Telegram saat kondisi bahaya terdeteksi.
 
 ---
 
@@ -528,12 +530,12 @@ Menggabungkan data dari `devices` dengan baris terakhir `sensor_logs` (berdasark
 Dipakai untuk endpoint ingest (`/api/v1/ingest`, `/api/sensor`).
 
 ```
-Header: X-API-Key: Smart*2026
+Header: X-API-Key: <api_key_device>
 ```
 
 Saat menerima request:
 1. Backend membaca raw key dari header `X-API-Key`
-2. Hitung SHA-256 dari raw key: `SHA256("Smart*2026")`
+2. Hitung SHA-256 dari raw key: `SHA256("<api_key_device>")`
 3. Bandingkan dengan kolom `api_key_hash` di tabel `devices`
 4. Jika cocok → `req.device` diisi, lanjut ke handler
 5. Jika tidak cocok → HTTP 401
@@ -542,9 +544,9 @@ Saat menerima request:
 Dipakai untuk semua endpoint read dan control.
 
 ```
-Header: Authorization: Bearer Smart*2026
+Header: Authorization: Bearer <ADMIN_TOKEN>
 # ATAU
-Header: X-API-Key: Smart*2026
+Header: X-API-Key: <ADMIN_TOKEN>
 ```
 
 Token dibandingkan langsung dengan env var `ADMIN_TOKEN`.
@@ -666,7 +668,7 @@ curl http://localhost:3000/health
 ```bash
 curl -X POST http://localhost:3000/api/v1/ingest \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: Smart*2026" \
+  -H "X-API-Key: <api_key_device>" \
   -d '{"id_device":"DAPUR01","suhu":30,"rh":55,"mq2_adc":100,"api":0}'
 ```
 
