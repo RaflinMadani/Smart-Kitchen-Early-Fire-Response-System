@@ -25,7 +25,7 @@ module.exports = {
   adminToken: process.env.ADMIN_TOKEN,
 
   // Sensor thresholds
-  ambangAsap:  parseInt(process.env.AMBANG_ASAP || '1000', 10),
+  ambangAsap:  parseInt(process.env.AMBANG_ASAP || '900', 10),
   ambangSuhu:  parseFloat(process.env.AMBANG_SUHU || '40'),
 
   // Timing
