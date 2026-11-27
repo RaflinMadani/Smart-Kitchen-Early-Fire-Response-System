@@ -118,5 +118,3 @@ smart-kitchen-backend/
 ```
 
 ---
-
-**Catatan:** Ambang deteksi yang digunakan sistem adalah kadar asap MQ-2 ADC > **900** (skala 0–4095) dan suhu > **40 °C**. Nilai ini dikonfigurasi di [`esp32/src/config.h`](esp32/src/config.h) untuk firmware dan diterapkan juga di backend melalui variabel lingkungan. Sistem ini merupakan prototipe proyek IoT untuk pemantauan serta respons awal terhadap indikasi kebakaran di dapur.
