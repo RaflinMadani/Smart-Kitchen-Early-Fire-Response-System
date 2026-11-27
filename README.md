@@ -1,6 +1,18 @@
 # Smart Kitchen Early Fire Response System
 
-**Tema Proyek:** Internet of Things (IoT) — Sistem Keamanan dan Otomasi Rumah Tangga
+**Tema Proyek:** Internet of Things (IoT) — Sistem Dapur Pintar dan Deteksi Kebakaran Dini
+
+## Identitas Kelompok
+
+**Kelompok 3 — Praktikum Internet of Things**  
+**Kelas: IF-A**
+
+| No. | Nama Anggota | NIM |
+|:---:|---|:---:|
+| 1 | Muhammad Wingga Tribaya | 123240008 |
+| 2 | Muhammad Faaiz | 123240009 |
+| 3 | Raflin Madani | 123240078 |
+| 4 | Muhammad Daud Akyaz | 123240081 |
 
 ## Deskripsi Proyek
 
@@ -66,14 +78,45 @@ Sistem menggunakan tiga kategori risiko yang dibentuk dari delapan kombinasi kon
 
 ```text
 smart-kitchen-backend/
-├── dashboard/   # Antarmuka monitoring dan kontrol berbasis web
-├── firmware/    # Program ESP32 untuk sensor, komunikasi, dan aktuator
-├── src/         # Backend, API, layanan, dan logika sistem
-├── sql/         # Script database MySQL
-├── docs/        # Dokumentasi API
-└── tests/       # Pengujian logika state engine
+├── dashboard/                   # Antarmuka monitoring dan kontrol berbasis web
+│   ├── index.html
+│   └── assets/
+│       ├── css/style.css
+│       ├── js/                  # api.js, charts.js, control.js, main.js, dll.
+│       └── vendor/              # Chart.js (bundel lokal)
+├── esp32/                       # Firmware ESP32 (PlatformIO)
+│   ├── src/
+│   │   ├── main.cpp             # Loop utama, logika hybrid, komunikasi MQTT/HTTP
+│   │   ├── config.h             # Pin, threshold, dan konstanta waktu
+│   │   └── EnvLoader.h          # Pembaca konfigurasi dari LittleFS (/.env)
+│   ├── include/
+│   ├── lib/
+│   └── platformio.ini
+├── src/                         # Backend Node.js
+│   ├── server.js                # Entry point
+│   ├── app.js                   # Setup Express dan middleware
+│   ├── config/                  # Koneksi database dan variabel lingkungan
+│   ├── routes/                  # Endpoint HTTP (ingest, sensor, control, read)
+│   ├── services/                # Logika bisnis (stateEngine, mqtt, alert, telegram)
+│   ├── repositories/            # Akses database (sensor, alert, device, control)
+│   ├── middlewares/             # Autentikasi device/admin dan error handler
+│   ├── jobs/                    # Tugas terjadwal (manualRevert, offlineWatcher)
+│   ├── validators/              # Validasi skema input
+│   └── utils/                   # Logger
+├── sql/                         # Skrip database MySQL
+│   ├── smart_kitchen.sql        # Skema awal
+│   ├── patch_v2.sql
+│   └── patch_opsi_a.sql
+├── docs/
+│   └── api.md                   # Dokumentasi REST API
+├── tests/
+│   └── stateEngine.test.js      # Pengujian logika state engine
+├── simulator.js                 # Simulator data sensor (untuk pengujian lokal)
+├── ecosystem.config.js          # Konfigurasi PM2
+├── .env.example                 # Template variabel lingkungan backend
+└── package.json
 ```
 
 ---
 
-**Catatan:** Ambang sensor dan respons aktuator mengikuti konfigurasi pada firmware dan backend proyek. Sistem ini merupakan prototipe proyek IoT untuk pemantauan serta respons awal terhadap indikasi kebakaran di dapur.
+**Catatan:** Ambang deteksi yang digunakan sistem adalah kadar asap MQ-2 ADC > **900** (skala 0–4095) dan suhu > **40 °C**. Nilai ini dikonfigurasi di [`esp32/src/config.h`](esp32/src/config.h) untuk firmware dan diterapkan juga di backend melalui variabel lingkungan. Sistem ini merupakan prototipe proyek IoT untuk pemantauan serta respons awal terhadap indikasi kebakaran di dapur.
